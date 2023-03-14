@@ -2,6 +2,7 @@
 # '/usr/include/pulse/introspect.h' '/usr/include/pulse/mainloop.h' '/usr/include/pulse/context.h' 
 # Refer additional licensing requirements for the files included
 # sample commands used
+# python3 /usr/bin/clang2py  --clang-args="-I/usr/include/clang/6.0/include -I/usr/include/pulse" -l /usr/lib/libpulse.so '/usr/include/pulse/introspect.h' '/usr/include/pulse/mainloop.h' '/usr/include/pulse/proplist.h'  
 # python3 /usr/local/bin/clang2py  --clang-args="-I/usr/include/clang/6.0/include -I/usr/include/pulse" -l /usr/lib/x86_64-linux-gnu/libpulse.so '/usr/include/pulse/introspect.h' '/usr/include/pulse/mainloop.h' 
 # python3 /usr/local/bin/clang2py  --clang-args="-I/usr/include/clang/6.0/include -I/usr/include/pulse" -l /usr/lib/x86_64-linux-gnu/libpulse.so '/usr/include/pulse/context.h' 
 ################################################################################
@@ -30,11 +31,7 @@
 
 # Updated to determine libpulse.so location
 import ctypes
-
-
-
-    
-
+from ctypes.util import find_library
 
 c_int128 = ctypes.c_ubyte*16
 c_uint128 = c_int128
@@ -84,12 +81,17 @@ else:
         return _class
 
 _libraries = {}
-import os.path
-if os.path.isfile('/usr/lib/x86_64-linux-gnu/libpulse.so'):
-    _libraries['libpulse.so'] = ctypes.CDLL('/usr/lib/x86_64-linux-gnu/libpulse.so')
-else:
-    _libraries['libpulse.so'] = ctypes.CDLL('/usr/lib/libpulse.so')
-    
+
+libpulse_library_name = find_library('pulse')
+if libpulse_library_name is None:
+    raise Exception('No libpulse.so library found!')
+
+try:
+    _libraries['libpulse.so'] = ctypes.cdll.LoadLibrary(libpulse_library_name)
+except OSError:
+    raise Exception('Cannot load libpulse.so library!')
+
+
 uint32_t = ctypes.c_uint32
 
 size_t = ctypes.c_uint64
@@ -484,6 +486,17 @@ pa_operation_unref.argtypes = [POINTER_T(struct_pa_operation)]
 #     ('tv_usec', ctypes.c_int64),
 # ]
 
+pa_proplist_to_string = _libraries['libpulse.so'].pa_proplist_to_string
+pa_proplist_to_string.restype = POINTER_T(ctypes.c_char)
+pa_proplist_to_string.argtypes = [POINTER_T(struct_pa_proplist)]
+
+pa_proplist_gets = _libraries['libpulse.so'].pa_proplist_gets
+pa_proplist_gets.restype = POINTER_T(ctypes.c_char)
+pa_proplist_gets.argtypes = [POINTER_T(struct_pa_proplist), POINTER_T(ctypes.c_char)]
+PA_DIRECTION_OUTPUT = 0x0001
+PA_DIRECTION_INPUT = 0x0002
+
+
 __all__ = \
     ['PA_CONTEXT_AUTHORIZING', 'PA_CONTEXT_CONNECTING',
     'PA_CONTEXT_FAILED', 'PA_CONTEXT_NOAUTOSPAWN',
@@ -528,4 +541,4 @@ __all__ = \
     'struct_pa_mainloop_api', 'struct_pa_operation',
     'struct_pa_proplist', 'struct_pa_sample_spec',
     'struct_pa_spawn_api', 'struct_pa_time_event', 'struct_pollfd',
-    'struct_timeval', 'uint32_t']
+    'struct_timeval', 'uint32_t','pa_proplist_to_string','pa_proplist_gets','PA_DIRECTION_OUTPUT', 'PA_DIRECTION_INPUT']

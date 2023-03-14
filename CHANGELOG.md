@@ -1,5 +1,36 @@
 ### Change log
 -----------------------
+#### 35,36 & 37
+* V40 compatibility updates
+* Remove C pointer references
+
+#### 34 & 33
+* Fixes for issues 
+  * [131](../../issues/131)
+  * [123](../../issues/123)
+  * [109](../../issues/109)
+  * [108](../../issues/108)
+  * [105](../../issues/105)
+* Removed option to "Show" device always in port settings, due to inconsistent behaviour and shell crashes
+
+#### 32
+* Updates for Gnome Shell 3.38 compatibility
+
+#### 31
+* Translation update - Portuguese 
+
+#### 30
+* Fixes for issue [97](https://github.com/kgshank/gse-sound-output-device-chooser/issues/97)
+* Error in preferences dialog due to log
+
+#### 29
+* Fixes for issue [95](https://github.com/kgshank/gse-sound-output-device-chooser/issues/95)
+#### 27 & 28
+* Fixes for broken updates from extension.gnome.org
+
+#### 26
+* Updates for Gnome Shell 3.36 compatibility
+
 #### 25
 * Fix Issues [66](https://github.com/kgshank/gse-sound-output-device-chooser/issues/66) / [68](https://github.com/kgshank/gse-sound-output-device-chooser/issues/68) - duplicate list after screen lock and unlock 
 
